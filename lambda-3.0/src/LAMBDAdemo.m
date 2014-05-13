@@ -33,10 +33,10 @@
 %           Mathematical Geodesy and Positioning, Delft University of
 %           Technology                              
 %------------------------------------------------------------------
-
+clear all;clc;
 % Specify the file which contains the float solution: a and Q
 load large
-
+%%
 [a_ILS,sqnorm]                    = LAMBDA(a,Q,1);
 % [a_ILS2]                        = LAMBDA(a,Q,2);
 [a_R]                             = LAMBDA(a,Q,3); 
