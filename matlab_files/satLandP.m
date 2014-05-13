@@ -1,5 +1,5 @@
 function [ Lmatrix, Amatrix,rho_f,Xs_f,Ys_f,Zs_f,P1_f,dtsL1_dtr_f,...
-    tAtoS_f, Phik, omegak, corrIonosphere, corrTroposphere,Az,El]...
+    tAtoS_f, Phik, omegak, corrIonosphere, corrTroposphere,Az,El,height,lat,long]...
     = satLandP( satelliteNumberOrder,P1_f,navfiles,XA0,YA0,ZA0,ndaysf,nhoursf,nminutesf,nsecondsf)
 %% Constants
 c = 299792458; % speed of light (m/s)
@@ -74,13 +74,13 @@ Zs_f = zk;
 %% 8. Compute satellite clock correction dtsL1 by (24) - (27)
 dtsL1_dtr_f = change_tsv_f + change_tr - tgd; % (24)
 %% 9. Compute ionospheric correction T_A_to_s (tA)
-ion.alpha = [2.0724D-08  1.4931D-08 -2.6513D-07 -4.5973D-07];
-ion.beta = [1.3581D+05 -1.2248D+05 -1.3794D+06 -2.1847D+06];
+ionalpha = [2.0724D-08  1.4931D-08 -2.6513D-07 -4.5973D-07];
+ionbeta = [1.3581D+05 -1.2248D+05 -1.3794D+06 -2.1847D+06];
 Time = 2 * 24 * 3600;
-IP = [ion.alpha; ion.beta];
+IP = [ionalpha; ionbeta];
 recEcef = [XA0,YA0,ZA0];
 satEcef = [Xs_f, Ys_f, Zs_f];
-[lat, long height]=fGC2GL(recEcef);
+[lat, long, height]=fGC2GL(recEcef);
 [Az,El] = fAzimElev(satEcef,recEcef);
 corrIonosphere = Klobuchar(Time, IP, lat, long, Az, El);
 %% 10. Compute tropospheric correction I_A_to_s (tA)
@@ -89,7 +89,7 @@ corrIonosphere = Klobuchar(Time, IP, lat, long, Az, El);
 % k3 = 3.75;
 % N = k1*pd/T + k2*ec/T + k3*ec/T^2;
 P = 955;
-corrTroposphere = 0.0022768 * P/(1-0.00266*cos(2*Az)-2.8*10e-7*El);
+corrTroposphere = 0.0022768 * P/(1-0.00266*cos(2*El*180/pi)-2.8*10^(-7)*height);
 % corrTroposphere = 2.277e-3*(1255/T0 + 0.05)*;
 %% 11. Compute approximate distance rho_A0_to_s (tA) by (11).
 rho_f = sqrt(...
